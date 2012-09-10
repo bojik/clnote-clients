@@ -26,12 +26,12 @@ class CLNote:
 		note.process()
 
 	def __init__(self, login, password, url, args):
+		if len(args) < 1:
+			args = ['list']
 		self.login = login
 		self.password = password
 		self.url = url
 		self.args = args
-		if len(self.args) < 1:
-			raise Exception("Incorrect paramter count")
 
 	def process(self):
 		command = self.args[0]
