@@ -12,14 +12,17 @@ class CLNote:
 	def main(cls, args):
 		cfg = ConfigParser.ConfigParser()
 		cfg.read(os.path.dirname(__file__) + '/clnote.cfg')
+
 		login = cfg.get('CLNOTE', 'LOGIN')
 		password = cfg.get('CLNOTE', 'PASSWORD')
 		url = cfg.get('CLNOTE', 'URL')
 		
-		CLNote.BLUE = '\033[9' + cfg.get('COLOR', 'DATE') + 'm'
+		CLNote.COLOR_DATE = '\033[9' + cfg.get('COLOR', 'DATE') + 'm'
 		#CLNote.GREEN = '\033[9' + cfg.get('COLOR', 'GREEN') + 'm'
-		CLNote.RED = '\033[9' + cfg.get('COLOR', 'ID') + 'm'
-		CLNote.WHITE = '\033[9' + cfg.get('COLOR', 'TEXT') + 'm'
+		CLNote.COLOR_ID = '\033[9' + cfg.get('COLOR', 'ID') + 'm'
+		CLNote.COLOR_TEXT = '\033[9' + cfg.get('COLOR', 'TEXT') + 'm'
+		CLNote.COLOR_LABELS = '\033[9' + cfg.get('COLOR', 'LABELS') + 'm'
+		CLNote.COLOR_ERRORS = '\033[9' + cfg.get('COLOR', 'ERRORS') + 'm'
 
 		args = args[1:]
 		note = CLNote(login, password, url, args)
@@ -57,10 +60,13 @@ class CLNote:
 
 	def doListCommand(self):
 		url = "%s/api/list" % self.url
-		data = self.executeRequest(url, {})
+		labels = self.args[1] if len(self.args) > 1 else ''
+		data = self.executeRequest(url, {'labels': labels})
 		for item in data['rows']:
-			print "%s%s%s%s%s%s" % (CLNote.BLUE, item['creation_date'] + "-" * 40, CLNote.ENDC, CLNote.RED, item['note_id'], CLNote.ENDC)
-			print "%s%s%s" % (CLNote.WHITE, item['note'], CLNote.ENDC)
+			print "%s%s%s %s%s%s %s%s%s" % (CLNote.COLOR_ID, item['note_id'], CLNote.ENDC, 
+				CLNote.COLOR_DATE, item['creation_date'] + " " + "-" * 40, CLNote.ENDC,
+				CLNote.COLOR_LABELS, item['label'], CLNote.ENDC)
+			print "%s%s%s" % (CLNote.COLOR_TEXT, item['note'], CLNote.ENDC)
 
 
 	def executeRequest(self, url, params):
@@ -71,9 +77,10 @@ class CLNote:
 		ret = json.load(res)
 		if not ret['success']:
 			self.printError(ret)
+			exit()
 		return ret
 
 	def printError(self, res):
-		print "%sError: %s%s" % (CLNote.RED, res['error']['message'], CLNote.ENDC)
+		print "%sError: %s%s" % (CLNote.COLOR_ERRORS, res['error']['message'], CLNote.ENDC)
 
 CLNote.main(sys.argv)
