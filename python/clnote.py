@@ -6,11 +6,7 @@ import urllib,urllib2
 
 class CLNote:
 
-	BLUE = '\033[94m'
-	GREEN = '\033[92m'
-	RED = '\033[91m'
 	ENDC = '\033[0m'
-
 
 	@classmethod		
 	def main(cls, args):
@@ -19,6 +15,12 @@ class CLNote:
 		login = cfg.get('CLNOTE', 'LOGIN')
 		password = cfg.get('CLNOTE', 'PASSWORD')
 		url = cfg.get('CLNOTE', 'URL')
+		
+		CLNote.BLUE = '\033[9' + cfg.get('COLOR', 'DATE') + 'm'
+		#CLNote.GREEN = '\033[9' + cfg.get('COLOR', 'GREEN') + 'm'
+		CLNote.RED = '\033[9' + cfg.get('COLOR', 'ID') + 'm'
+		CLNote.WHITE = '\033[9' + cfg.get('COLOR', 'TEXT') + 'm'
+
 		args = args[1:]
 		note = CLNote(login, password, url, args)
 		note.process()
@@ -58,7 +60,7 @@ class CLNote:
 		data = self.executeRequest(url, {})
 		for item in data['rows']:
 			print "%s%s%s%s%s%s" % (CLNote.BLUE, item['creation_date'] + "-" * 40, CLNote.ENDC, CLNote.RED, item['note_id'], CLNote.ENDC)
-			print item['note']
+			print "%s%s%s" % (CLNote.WHITE, item['note'], CLNote.ENDC)
 
 
 	def executeRequest(self, url, params):
