@@ -44,6 +44,8 @@ class CLNote:
 			self.doAddCommand()
 		elif(command == 'list'):
 			self.doListCommand()
+		elif(command == 'delete'):
+			self.doDeleteCommand()
 		else:
 			raise Exception("Unknown command");
 
@@ -67,6 +69,14 @@ class CLNote:
 				CLNote.COLOR_DATE, item['creation_date'] + " " + "-" * 40, CLNote.ENDC,
 				CLNote.COLOR_LABELS, item['label'], CLNote.ENDC)
 			print "%s%s%s" % (CLNote.COLOR_TEXT, item['note'], CLNote.ENDC)
+
+	def doDeleteCommand(self):
+		noteId = self.args[1] if len(self.args) > 1 else ''
+		url = "%s/api/delete" % self.url
+		params = {
+			'note_id': noteId
+		}
+		self.executeRequest(url, params)
 
 
 	def executeRequest(self, url, params):
